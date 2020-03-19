@@ -16,6 +16,11 @@ app.get("/api/hello", function(req, res) {
 	res.json("Hello API!");
 });
 
+app.post("/api/shorturl/new", function(req, res) {
+	console.log(req);
+	res.send("yas");
+})
+
 
 app.listen("8000", function() {
 	console.log("URL Shortener listening on " + "8000" + "!")

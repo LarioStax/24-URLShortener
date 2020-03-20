@@ -28,7 +28,8 @@ app.get("/api/hello", function(req, res) {
 	res.json("Hello API!");
 });
 
-app.post("/api/shorturl/new", function(req, res) {
+
+app.post("/api/shorturl/new", isLink, function(req, res) {
 	let originalLink = req.body.url;
 	let randomNumber = Math.floor(Math.random(1)*1000); //refactor this later to count all items in db collection and set it to that number!
 	let newLink = {original_url: originalLink, short_url: randomNumber};
@@ -45,6 +46,8 @@ app.post("/api/shorturl/new", function(req, res) {
 	})
 });
 
+//links: 303, 186, 678
+
 app.get("/api/shorturl/:num", function(req, res) {
 	let short_url = Number(req.params.num);
 	console.log(typeof short_url)
@@ -54,12 +57,26 @@ app.get("/api/shorturl/:num", function(req, res) {
 			res.send("Link not found!")
 		} else {
 			console.log(foundLink);
-			// res.json(foundLink);
 			res.json({"original_url": foundLink[0].original_url, "short_url": foundLink[0].short_url});
 		}
 	})
 
 })
+
+function isLink(req, res, next) {
+	let checkLink = req.body.url;
+	let regexHttp = /^https?:\/\/.+/gi;
+	let regexWww = /^www\..+/gi;
+	if (regexHttp.test(checkLink)) {
+		console.log("correct link");
+		next();
+	} else if (regexWww.test(checkLink)) {
+		console.log("correct link");
+		next();
+	} else {
+		res.json({"error": "Please provide a valid url!"});
+	}
+}
 
 
 let port = process.env.PORT || 8000;

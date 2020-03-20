@@ -45,6 +45,22 @@ app.post("/api/shorturl/new", function(req, res) {
 	})
 });
 
+app.get("/api/shorturl/:num", function(req, res) {
+	let short_url = Number(req.params.num);
+	console.log(typeof short_url)
+	Link.find({short_url: short_url}, function(err, foundLink) {
+		if (err || !foundLink) {
+			console.log(err);
+			res.send("Link not found!")
+		} else {
+			console.log(foundLink);
+			// res.json(foundLink);
+			res.json({"original_url": foundLink[0].original_url, "short_url": foundLink[0].short_url});
+		}
+	})
+
+})
+
 
 let port = process.env.PORT || 8000;
 app.listen(port, function() {

@@ -30,13 +30,9 @@ app.get("/api/hello", function(req, res) {
 
 
 app.post("/api/shorturl/new", [isLink, findNumOfLinks], function(req, res) {
-	console.log("The count is - " + req.count);
 	let originalLink = req.body.url;
-	let randomNumber = Math.floor(Math.random(1)*1000); //refactor this later to count all items in db collection and set it to that number!
-	let newLink = {original_url: originalLink, short_url: randomNumber};
-	console.log(originalLink);
-	console.log(randomNumber);
-	console.log(newLink);
+	let count = req.count + 1; //count is number of links in db + 1
+	let newLink = {original_url: originalLink, short_url: count};
 	Link.create(newLink, function(err, newLink) {
 		if (err) {
 			console.log(err);
@@ -47,17 +43,13 @@ app.post("/api/shorturl/new", [isLink, findNumOfLinks], function(req, res) {
 	})
 });
 
-//links: 303, 186, 678, 875, 887, 195
-
 app.get("/api/shorturl/:num", function(req, res) {
 	let short_url = Number(req.params.num);
-	console.log(typeof short_url)
 	Link.find({short_url: short_url}, function(err, foundLink) {
 		if (err || !foundLink) {
 			console.log(err);
 			res.send("Link not found!")
 		} else {
-			console.log(foundLink);
 			res.json({"original_url": foundLink[0].original_url, "short_url": foundLink[0].short_url});
 		}
 	})
@@ -84,7 +76,6 @@ function findNumOfLinks(req, res, next) {
 		if (err) {
 			console.log(err);
 		} else {
-			console.log(foundLinks);
 			req.count = foundLinks.length;
 			next();
 		}

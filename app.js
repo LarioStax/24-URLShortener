@@ -4,6 +4,8 @@ const mongo = require("mongodb");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
+const Link = require("./models/link.js")
+
 const cors = require("cors");
 app.use(cors({optionSuccessStatus: 200}));
 
@@ -23,10 +25,10 @@ app.get("/api/hello", function(req, res) {
 app.post("/api/shorturl/new", function(req, res) {
 	console.log(req.body);
 	res.send("yas");
-})
+});
 
 
 let port = process.env.PORT || 8000;
 app.listen(port, function() {
 	console.log("URL Shortener listening on " + port + "!")
-})
+});

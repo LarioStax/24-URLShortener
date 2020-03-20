@@ -29,7 +29,8 @@ app.get("/api/hello", function(req, res) {
 });
 
 
-app.post("/api/shorturl/new", isLink, function(req, res) {
+app.post("/api/shorturl/new", [isLink, findNumOfLinks], function(req, res) {
+	console.log("The count is - " + req.count);
 	let originalLink = req.body.url;
 	let randomNumber = Math.floor(Math.random(1)*1000); //refactor this later to count all items in db collection and set it to that number!
 	let newLink = {original_url: originalLink, short_url: randomNumber};
@@ -46,7 +47,7 @@ app.post("/api/shorturl/new", isLink, function(req, res) {
 	})
 });
 
-//links: 303, 186, 678
+//links: 303, 186, 678, 875, 887, 195
 
 app.get("/api/shorturl/:num", function(req, res) {
 	let short_url = Number(req.params.num);
@@ -76,6 +77,18 @@ function isLink(req, res, next) {
 	} else {
 		res.json({"error": "Please provide a valid url!"});
 	}
+}
+
+function findNumOfLinks(req, res, next) {
+	Link.find({}, function(err, foundLinks) {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log(foundLinks);
+			req.count = foundLinks.length;
+			next();
+		}
+	});;
 }
 
 

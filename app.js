@@ -67,6 +67,7 @@ app.get("/api/shorturl/:num", function(req, res) {
 // - INDEX PAGE SHOWING ALL EXISTING URLS
 // - CHECK WETHER A LINK IS ALREADY INCLUDED AND GIVING EXISTING SHORT URL INSTEAD OF CREATING NEW ONE
 // - CREATING A ROUTES FILE AND MOVING THE ROUTES THERE
+// - CREATE A COPY WITH CORRECT BEST PRACTICES RESTFUL ROUTING!
 // ****************************************************************************
 
 let port = process.env.PORT || 8000;

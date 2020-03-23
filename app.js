@@ -23,7 +23,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 //MONGOOSE CONFIG
-mongoose.connect("mongodb://localhost/url_shortener",
+mongoose.connect(process.env.DATABASE_URL,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true 

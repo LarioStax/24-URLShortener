@@ -6,6 +6,10 @@ const bodyParser = require("body-parser");
 
 const Link = require("./models/link.js")
 
+const middleware = require("./middleware/index.js")
+
+
+//CORS CONFIG FOR FCC TESTS
 const cors = require("cors");
 app.use(cors({optionSuccessStatus: 200}));
 
@@ -14,6 +18,11 @@ app.use('/public', express.static('public')); //why this?!
 //body parser to be able to use req.body!
 app.use(bodyParser.urlencoded({extended: false}));
 
+//DOTENV CONFIG
+const dotenv = require("dotenv");
+dotenv.config();
+
+//MONGOOSE CONFIG
 mongoose.connect("mongodb://localhost/url_shortener",
 	{
 		useNewUrlParser: true,
@@ -29,16 +38,15 @@ app.get("/api/hello", function(req, res) {
 });
 
 
-app.post("/api/shorturl/new", [isLink, findNumOfLinks], function(req, res) {
+app.post("/api/shorturl/new", [middleware.isLink, middleware.findNumOfLinks], function(req, res) {
 	let originalLink = req.body.url;
 	let count = req.count + 1; //count is number of links in db + 1
 	let newLink = {original_url: originalLink, short_url: count};
 	Link.create(newLink, function(err, newLink) {
 		if (err) {
-			console.log(err);
+			res.send(err);
 		} else {
-			console.log(newLink);
-			res.send("Success!!!");
+			res.json({"original_url": newLink.original_url, "short_url": newLink.short_url});
 		}
 	})
 });
@@ -47,41 +55,19 @@ app.get("/api/shorturl/:num", function(req, res) {
 	let short_url = Number(req.params.num);
 	Link.find({short_url: short_url}, function(err, foundLink) {
 		if (err || !foundLink) {
-			console.log(err);
 			res.send("Link not found!")
 		} else {
 			res.json({"original_url": foundLink[0].original_url, "short_url": foundLink[0].short_url});
 		}
 	})
+});
 
-})
-
-function isLink(req, res, next) {
-	let checkLink = req.body.url;
-	let regexHttp = /^https?:\/\/.+/gi;
-	let regexWww = /^www\..+/gi;
-	if (regexHttp.test(checkLink)) {
-		console.log("correct link");
-		next();
-	} else if (regexWww.test(checkLink)) {
-		console.log("correct link");
-		next();
-	} else {
-		res.json({"error": "Please provide a valid url!"});
-	}
-}
-
-function findNumOfLinks(req, res, next) {
-	Link.find({}, function(err, foundLinks) {
-		if (err) {
-			console.log(err);
-		} else {
-			req.count = foundLinks.length;
-			next();
-		}
-	});;
-}
-
+// ****************************************************************************
+// ADDITIONAL THINGS/FUNCTIONALITY TO CODE IN:
+// - INDEX PAGE SHOWING ALL EXISTING URLS
+// - CHECK WETHER A LINK IS ALREADY INCLUDED AND GIVING EXISTING SHORT URL INSTEAD OF CREATING NEW ONE
+// - CREATING A ROUTES FILE AND MOVING THE ROUTES THERE
+// ****************************************************************************
 
 let port = process.env.PORT || 8000;
 app.listen(port, function() {
